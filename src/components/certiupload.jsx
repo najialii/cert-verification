@@ -54,10 +54,10 @@ function Certiupload() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-100 to-white flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col items-center justify-center p-4">
       {/* Header */}
       <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-orange-600">Upload Certificate</h1>
+        <h1 className="text-4xl font-bold text-blue-600">Upload Certificate</h1>
         <p className="text-gray-600 mt-2">
           Add a new certificate to the collection.
         </p>
@@ -77,7 +77,7 @@ function Certiupload() {
           placeholder="e.g., 123456"
           value={formData.certienum}
           onChange={handleInputChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
           required
         />
 
@@ -91,7 +91,7 @@ function Certiupload() {
           placeholder="e.g., John Doe"
           value={formData.name}
           onChange={handleInputChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
           required
         />
 
@@ -105,7 +105,7 @@ function Certiupload() {
           placeholder="e.g., Course Name"
           value={formData.coursename}
           onChange={handleInputChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
           required
         />
 
@@ -118,7 +118,7 @@ function Certiupload() {
           type="date"
           value={formData.expairydate}
           onChange={handleInputChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
         />
 
         <label htmlFor="status" className="flex items-center text-gray-700 font-semibold mb-4">
@@ -135,7 +135,7 @@ function Certiupload() {
 
         <button
           type="submit"
-          className="w-full bg-orange-600 text-white py-2 rounded-md hover:bg-orange-700 transition"
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
           disabled={loading}
         >
           {loading ? "Uploading..." : "Upload Certificate"}

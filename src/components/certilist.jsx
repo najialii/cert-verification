@@ -58,17 +58,17 @@ function Certilist() {
   const totalPages = Math.ceil(totalCertificates / pageSize);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-100 to-white flex flex-col items-center p-6">
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-orange-400">Certificate List</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col items-center p-6">
+      <header className="text-center  mb-8">
+        <h1 className="text-4xl font-bold text-blue-600">Certificate List</h1>
         <p className="text-gray-600 mt-2">Manage your uploaded certificates efficiently</p>
       </header>
 
-      {loading && <div className="text-orange-600 font-semibold text-lg">Loading...</div>}
+      {loading && <div className="text-blue-600 font-semibold text-lg">Loading...</div>}
       {error && <div className="text-red-500 font-semibold">{error}</div>}
 
       {!loading && !error && (
-        <div className="w-full max-w-7xl bg-white p-6 rounded-xl shadow-xl">
+        <div className="w-full max-w-7xl  p-6 rounded-xl shadow-xl">
           {certificates.length > 0 ? (
             <>
               <div className="mb-4 flex justify-between items-center">
@@ -89,7 +89,7 @@ function Certilist() {
               </div>
 
               <table className="w-full table-auto text-gray-700">
-                <thead className="bg-orange-400 text-white">
+                <thead className="bg-blue-400 text-white">
                   <tr>
                     <th className="px-6 py-3 text-left">#</th>
                     <th className="px-6 py-3 text-left">Certificate No</th>
@@ -120,7 +120,7 @@ function Certilist() {
 
               <div className="mt-6 flex justify-between items-center">
                 <button
-                  className="bg-orange-600 text-white px-4 py-2 rounded-md disabled:bg-gray-300"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-300"
                   disabled={currentPage === 1}
                   onClick={() => handlePageChange(currentPage - 1)}
                 >
@@ -129,12 +129,12 @@ function Certilist() {
 
                 <div className="flex items-center">
                   <span className="mr-2 text-gray-700">Page</span>
-                  <strong className="text-orange-600">{currentPage}</strong>
+                  <strong className="text-blue-600">{currentPage}</strong>
                   <span className="ml-2 text-gray-700">of {totalPages}</span>
                 </div>
 
                 <button
-                  className="bg-orange-600 text-white px-4 py-2 rounded-md disabled:bg-gray-300"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-gray-300"
                   disabled={currentPage === totalPages}
                   onClick={() => handlePageChange(currentPage + 1)}
                 >

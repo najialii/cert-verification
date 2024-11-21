@@ -124,7 +124,7 @@ function BulkUpload() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-orange-600">Bulk Upload</h1>
+        <h1 className="text-4xl font-bold text-blue-600">Bulk Upload</h1>
         <p className="text-gray-600 mt-2">
           Paste your CSV data below to upload it to the collection.
         </p>
@@ -134,7 +134,7 @@ function BulkUpload() {
         value={csvData}
         onChange={(e) => setCsvData(e.target.value)}
         rows={10}
-        className="w-full max-w-2xl p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500"
+        className="w-full max-w-2xl p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
         placeholder="Paste your CSV data here..."
       ></textarea>
 

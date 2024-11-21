@@ -5,7 +5,7 @@ function Header() {
   return (
     <header className="lg:px-16 px-4 bg-white  flex flex-wrap items-center py-4 shadow-md">
       <div className="flex-1 flex  justify-between items-center">
-        <Link to="/" className="text-xl text-orange-500 font-bold">Certificate Verification</Link>
+        <Link to="/" className="text-xl text-blue-500 font-bold">Arabian Safety</Link>
       </div>
 
       <label htmlFor="menu-toggle" className="pointer-cursor md:hidden block">
@@ -24,7 +24,7 @@ function Header() {
 
       <div className="hidden md:flex md:items-center md:w-auto w-full" id="menu">
         <nav>
-          <ul className="md:flex items-center justify-between text-base text-gray-700 pt-4 md:pt-0">
+          {/* <ul className="md:flex items-center justify-between text-base text-gray-700 pt-4 md:pt-0">
           
             <li>
               <Link className="md:p-4 py-3 px-0 block" to="/upload">
@@ -37,11 +37,11 @@ function Header() {
               </Link>
             </li>
             <li>
-              {/* <Link className="md:p-4 py-3 px-0 block md:mb-0 mb-2" to="/file">
+              <Link className="md:p-4 py-3 px-0 block md:mb-0 mb-2" to="/file">
                 Bulk Upload
-              </Link> */}
+              </Link>
             </li>
-          </ul>
+          </ul> */}
         </nav>
       </div>
     </header>
