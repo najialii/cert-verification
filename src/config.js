@@ -5,7 +5,7 @@ const API_CONFIG = {
   // USE_LOCAL: false for remote Cockpit CMS
   USE_LOCAL: true,
   
-  LOCAL_URL: "http://localhost:3001",
+  LOCAL_URL: window.location.hostname === 'localhost' ? "http://localhost:3001" : "https://arabainsafety.com",
   REMOTE_URL: "http://5.189.163.66/cert-verification",
   
   get BASE_URL() {
