@@ -1,0 +1,122 @@
+Line 405: Could not parse date "Electrical Safety" for Kotian"
+Line 474: Could not parse date "HAZCOM" for Vikash"
+Line 708: Could not parse date "Manlift Operator" for Correa Jr"
+Line 882: Could not parse date "HAZCOM" for Amr"
+Line 935: Could not parse date "Scissor Lift Operator" for Pastrana"
+Line 937: Could not parse date "Scissor Lift Operator" for Sabdao"
+Line 1024: Could not parse date "Basic Fire Fighting" for Amr"
+Line 1105: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Amr"
+Line 1181: Could not parse date "Forklift Operator" for Sabdao"
+Line 1183: Could not parse date "Forklift Operator" for Pastrana"
+Line 1184: Could not parse date "Forklift Operator" for Laigo"
+Line 1234: Could not parse date "HACCP Awareness" for Phurpa Chewang"
+Line 1243: Could not parse date "HAZCOM" for Phurpa Chewang"
+Line 1246: Could not parse date "HAZCOM" for Sundaran"
+Line 1292: Could not parse date "Inspection" for AT0180022
+Line 1293: Could not parse date "Inspection" for AT0180023
+Line 1294: Could not parse date "Inspection" for AT0180024
+Line 1341: Could not parse date "Overhead Crane Operator" for Sabdao"
+Line 1345: Could not parse date "Overhead Crane Operator" for Pastrana"
+Line 1379: Could not parse date "HACCP Awareness" for Mohammad"
+Line 1380: Could not parse date "HACCP Awareness" for Lakshmanan"
+Line 1384: Could not parse date "HAZCOM" for Mohammad"
+Line 1385: Could not parse date "HAZCOM" for Lakshmanan"
+Line 1405: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Man Bahadur"
+Line 1406: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Mohammad"
+Line 1407: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Lakshmanan"
+Line 1437: Could not parse date "Basic Fire Fighting" for Man Bahadur"
+Line 1438: Could not parse date "Basic Fire Fighting" for Mohammad"
+Line 1439: Could not parse date "Basic Fire Fighting" for Lakshmanan"
+Line 1558: Could not parse date "Authorize Gas Testing" for Algier Palma"
+Line 1559: Could not parse date "Authorize Gas Testing" for Bryan Homuad"
+Line 1560: Could not parse date "Authorize Gas Testing" for Eleonido Cornelio"
+Line 1561: Could not parse date "Authorize Gas Testing" for Reniel Santiago Quinit"
+Line 1562: Could not parse date "Authorize Gas Testing" for Rodrigo Jr Galicia"
+Line 1563: Could not parse date "Authorize Gas Testing" for Roberto Cacapit Jr"
+Line 1564: Could not parse date "Authorize Gas Testing" for Philip Rosales"
+Line 1565: Could not parse date "Authorize Gas Testing" for Gretchen Cornejo"
+Line 1566: Could not parse date "Authorize Gas Testing" for Julian Ii Peligrino Ii"
+Line 1567: Could not parse date "Authorize Gas Testing" for Danilo Jr Dacones"
+Line 1568: Could not parse date "Authorize Gas Testing" for Christian Peralta"
+Line 1569: Could not parse date "Authorize Gas Testing" for Joven Escobar"
+Line 1570: Could not parse date "Authorize Gas Testing" for John Mark Magramo"
+Line 1571: Could not parse date "Authorize Gas Testing" for Jayvee Suba"
+Line 1572: Could not parse date "Authorize Gas Testing" for Adrian Matacot"
+Line 1573: Could not parse date "Authorize Gas Testing" for Christopher Maranan"
+Line 1574: Could not parse date "Authorize Gas Testing" for Daryl John Arciga"
+Line 1575: Could not parse date "Authorize Gas Testing" for Asalam"
+Line 1576: Could not parse date "Authorize Gas Testing" for Rijwan"
+Line 1577: Could not parse date "Authorize Gas Testing" for Walden Acat"
+Line 1578: Could not parse date "Authorize Gas Testing" for Michael Bucao"
+Line 1614: Could not parse date "Working at Heights & Rescue"" for AT0180345
+Line 1751: Could not parse date "DROPS Awareness" for Mahdi Adel"
+Line 1937: Could not parse date "Confined Space Entry with Gas Testing & SCBA" for Goklas"
+Line 1938: Could not parse date "Confined Space Entry with Gas Testing & SCBA" for Imanuel"
+Line 1940: Could not parse date "Confined Space Entry with Gas Testing & SCBA" for Syaifuddin"
+Line 1941: Could not parse date "Confined Space Entry with Gas Testing & SCBA" for Muhammad"
+Line 1942: Could not parse date "Confined Space Entry with Gas Testing & SCBA" for Achmad"
+Line 1981: Could not parse date "Inspection" for AT0180712
+Line 1982: Could not parse date "Inspection" for AT0180713
+Line 1983: Could not parse date "Inspection" for AT0180714
+Line 1984: Could not parse date "Inspection" for AT0180715
+Line 2037: Could not parse date "HACCP Awareness" for Man Bahadur"
+Line 2046: Could not parse date "HAZCOM" for Man Bahadur"
+Line 2816: Could not parse date "Forklift Operator" for Lili"
+Line 3986: Could not parse date "Fire Fighting" for Faraj Mabrouk S"
+Line 3987: Could not parse date "Fire Fighting" for Mohammed Hamad A"
+Line 4059: Could not parse date "Manual Handling" for Jishun"
+Line 4060: Could not parse date "Manual Handling" for Samanta"
+Line 4061: Could not parse date "Manual Handling" for Zeeshan"
+Line 4062: Could not parse date "Manual Handling" for Rahmathulla"
+Line 4063: Could not parse date "Manual Handling" for Bhuvarahan"
+Line 4072: Could not parse date "STOP Program" for Jishun"
+Line 4073: Could not parse date "STOP Program" for Samanta"
+Line 4074: Could not parse date "STOP Program" for Zeeshan"
+Line 4075: Could not parse date "STOP Program" for Rahmathulla"
+Line 4076: Could not parse date "STOP Program" for Bhuvarahan"
+Line 4140: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Jishun"
+Line 4141: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Samanta"
+Line 4142: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Zeeshan"
+Line 4143: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Rahmathulla"
+Line 4144: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Bhuvarahan"
+Line 4146: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Melvin"
+Line 4147: Could not parse date "Hydrogen Sulfide (H2S) and SCBA" for Javed"
+Line 4149: Could not parse date "Basic Fire Fighting" for Jishun"
+Line 4150: Could not parse date "Basic Fire Fighting" for Samanta"
+Line 4151: Could not parse date "Basic Fire Fighting" for Zeeshan"
+Line 4152: Could not parse date "Basic Fire Fighting" for Rahmathulla"
+Line 4153: Could not parse date "Basic Fire Fighting" for Bhuvarahan"
+Line 4156: Could not parse date "Basic Fire Fighting" for Melvin"
+Line 4157: Could not parse date "Basic Fire Fighting" for Javed"
+Line 4273: Could not parse date "Respiratory Protection" for Rahmathulla"
+Line 4745: Could not parse date "Basic Fire Fighting" for Sajan"
+Line 4935: Could not parse date "HAZCOM" for Sajan"
+Line 7020: Could not parse date "HAZCOM" for Yam Bahadur"
+Line 7021: Could not parse date "HAZCOM" for Bishnu"
+Line 7025: Could not parse date "Overhead Crane Level 2" for Raymond"
+Line 7037: Could not parse date "Overhead Crane Level 1" for Mohammed Z"
+Line 7038: Could not parse date "Overhead Crane Level 1" for Ali"
+Line 7095: Could not parse date "Scissorlift Operator" for Balignasay"
+Line 7107: Could not parse date "Basic Fire Fighting" for Mohammed Mudher A"
+Line 7108: Could not parse date "Basic Fire Fighting" for Mohammed Nasser E"
+Line 7169: Could not parse date "Termite Control and Disinfection"" for AT0185902
+Line 7181: Could not parse date "Termite Control and Disinfection"" for AT0185914
+Line 7182: Could not parse date "Termite Control and Disinfection"" for AT0185915
+Line 7183: Could not parse date "Termite Control and Disinfection"" for AT0185916
+Line 7184: Could not parse date "Termite Control and Disinfection"" for AT0185917
+Line 7185: Could not parse date "Termite Control and Disinfection"" for AT0185918
+Line 7186: Could not parse date "Termite Control and Disinfection"" for AT0185919
+Line 7187: Could not parse date "Termite Control and Disinfection"" for AT0185920
+Line 8072: Could not parse date "Electrical Safety" for Antenor"
+Line 8086: Could not parse date "Defensive Driving" for Rosario"
+Line 8211: Could not parse date "Defensive Driving" for Ali Gaber"
+Line 8212: Could not parse date "Defensive Driving" for Irshad Ahmed Baba"
+Line 9109: Could not parse date "Asbestos Awareness" for Jhabi Lal"
+Line 9115: Could not parse date "DROPS Awareness" for Jhabi Lal"
+Line 9864: Could not parse date "Slinging and Banksman"" for AT0188608
+Line 9865: Could not parse date "Slinging and Banksman"" for AT0188609
+Line 9866: Could not parse date "Slinging and Banksman"" for AT0188610
+Line 9867: Could not parse date "Slinging and Banksman"" for AT0188611
+Line 9868: Could not parse date "Slinging and Banksman"" for AT0188612
+Line 9869: Could not parse date "Slinging and Banksman"" for AT0188613
+Line 9870: Could not parse date "Slinging and Banksman"" for AT0188614

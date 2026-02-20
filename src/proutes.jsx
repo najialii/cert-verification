@@ -2,14 +2,14 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('cockpitToken'); // Get token from localStorage
+  const isAuthenticated = localStorage.getItem('isAuthenticated'); // Get authentication status
 
-  if (!token) {
-    // If no token exists, redirect to login page
+  if (!isAuthenticated || isAuthenticated !== 'true') {
+    // If not authenticated, redirect to login page
     return <Navigate to="/loadin" />;
   }
 
-  return children; // If token exists, allow access to the route
+  return children; // If authenticated, allow access to the route
 };
 
 export default ProtectedRoute;

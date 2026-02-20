@@ -1,0 +1,2 @@
+make a var tpo change the status 
+when change the status it changes the state var and fire the fun 

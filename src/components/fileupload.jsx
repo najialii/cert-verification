@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 function BulkUpload() {
   const [csvData, setCsvData] = useState("");
@@ -6,56 +6,278 @@ function BulkUpload() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [currentEntry, setCurrentEntry] = useState(0);
+  const [totalEntries, setTotalEntries] = useState(0);
 
-  // Function to parse CSV data
-  const parseCSV = () => {
-    // Split the CSV into rows
-    const rows = csvData.trim().split("\n");
-    // Extract headers
-    const headers = rows[0].split(",").map((header) => header.trim());
-    // Map through the rows and create objects based on the headers
-    const data = rows.slice(1).map((row) => {
-      const values = row.split(",").map((value) => value.trim());
-      return headers.reduce((obj, header, index) => {
-        obj[header] = values[index];
-        return obj;
-      }, {});
-    });
-    setParsedData(data);
+  // Function to handle CSV file upload
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setFileName(file.name);
+    setError(null);
+    setSuccess(null);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      setCsvData(text);
+      parseCSVData(text);
+    };
+    reader.onerror = () => {
+      setError("Failed to read file");
+    };
+    reader.readAsText(file);
   };
 
-  // Function to handle and format the date correctly (MM/DD/YYYY to YYYY-MM-DD)
-  const formatDate = (dateStr) => {
-    if (!dateStr) return null;
+  // Function to parse CSV data
+  const parseCSVData = (data) => {
+    try {
+      // Split the CSV into rows
+      const rows = data.trim().split("\n");
+      if (rows.length === 0) {
+        setError("CSV file is empty");
+        return;
+      }
 
-    // Debug log to check the raw date
-    console.log("Raw Date String:", dateStr);
-
-    const dateParts = dateStr.split("/");
-
-    // Ensure there are three parts for month, day, and year
-    if (dateParts.length === 3) {
-      const formattedDate = new Date(`${dateParts[0]}/${dateParts[1]}/${dateParts[2]}`);
+      // Extract headers and clean them
+      const rawHeaders = rows[0].split(",").map((header) => header.trim().replace(/[^\x20-\x7E]/g, ''));
+      console.log("CSV Headers:", rawHeaders);
       
-      if (formattedDate instanceof Date && !isNaN(formattedDate)) {
-        // Return the date in YYYY-MM-DD format
-        return formattedDate.toISOString().split("T")[0];
-      } else {
-        // Log invalid date for debugging
-        console.log("Invalid Date:", dateStr);
+      // Create a mapping for flexible column names
+      const headerMap = {};
+      rawHeaders.forEach((header, index) => {
+        const cleanHeader = header.toLowerCase().replace(/[^a-z0-9]/g, '');
+        
+        // Map various possible column names to standard names
+        if (cleanHeader.includes('student') && cleanHeader.includes('name')) {
+          headerMap['Student Name'] = index;
+        } else if (cleanHeader.includes('name') && !headerMap['Student Name']) {
+          headerMap['Student Name'] = index;
+        }
+        
+        if (cleanHeader.includes('certif') && cleanHeader.includes('no')) {
+          headerMap['Certificate No.'] = index;
+        } else if (cleanHeader.includes('certificate') && cleanHeader.includes('no')) {
+          headerMap['Certificate No.'] = index;
+        }
+        
+        if (cleanHeader.includes('course')) {
+          headerMap['Course Name'] = index;
+        }
+        
+        if (cleanHeader.includes('expir') || (cleanHeader.includes('date') && index > 2)) {
+          headerMap['Certificate Expiry Date'] = index;
+        }
+      });
+      
+      console.log("Raw Headers:", rawHeaders);
+      console.log("Header Mapping:", headerMap);
+      
+      // Map through the rows and create objects based on the headers
+      const parsedRows = rows.slice(1)
+        .filter(row => row.trim() !== "") // Filter out empty rows
+        .map((row, rowIndex) => {
+          const values = row.split(",").map((value) => value.trim());
+          
+          return {
+            'Student Name': values[headerMap['Student Name']] || values[0] || "",
+            'Certificate No.': values[headerMap['Certificate No.']] || values[1] || "",
+            'Course Name': values[headerMap['Course Name']] || values[2] || "",
+            'Certificate Expiry Date': values[headerMap['Certificate Expiry Date']] || values[3] || ""
+          };
+        });
+      
+      setParsedData(parsedRows);
+      console.log(`Parsed ${parsedRows.length} entries from CSV`);
+      console.log("Sample entry:", parsedRows[0]);
+      setSuccess(`Successfully loaded ${parsedRows.length} entries from ${fileName || 'file'}`);
+    } catch (err) {
+      setError(`Failed to parse CSV: ${err.message}`);
+      console.error("CSV parsing error:", err);
+    }
+  };
+
+  // Function to parse CSV from textarea
+  const parseCSV = () => {
+    if (!csvData.trim()) {
+      setError("Please paste CSV data or upload a file");
+      return;
+    }
+    parseCSVData(csvData);
+  };
+
+  // Function to handle and format the date correctly - supports multiple formats
+  const formatDate = (dateStr) => {
+    if (!dateStr || dateStr.trim() === "") return null;
+
+    dateStr = dateStr.trim();
+    let parsedDate = null;
+
+    // Format 1: "6-Jan-23", "1-Aug-24", "20-Jun-26" (day-month(name)-year with dash)
+    if (dateStr.includes("-")) {
+      const parts = dateStr.split("-");
+      
+      // Handle missing day like "-Nov-26"
+      if (parts.length === 3 && parts[0] === "") {
+        parts[0] = "1"; // Default to 1st day
+      }
+      
+      if (parts.length === 3) {
+        const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+        const monthNamesAlt = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+        
+        // Handle common misspellings
+        const monthMisspellings = {
+          "augsut": "aug",
+          "agust": "aug",
+          "septemper": "sep",
+          "ocotber": "oct",
+          "novemper": "nov",
+          "decemper": "dec"
+        };
+        
+        let middleLower = parts[1].toLowerCase().replace(/[^a-z]/g, ''); // Remove non-letters
+        
+        // Check for misspellings first
+        if (monthMisspellings[middleLower]) {
+          middleLower = monthMisspellings[middleLower];
+        }
+        
+        // Check if it's a month name
+        let monthIndex = monthNames.indexOf(middleLower);
+        if (monthIndex === -1) {
+          monthIndex = monthNamesAlt.indexOf(middleLower);
+        }
+        
+        if (monthIndex !== -1) {
+          // Format: "6-Jan-23" or "0-Aug-25" (handle invalid day)
+          let day = parseInt(parts[0]) || 1; // Default to 1 if invalid or 0
+          if (day === 0) day = 1; // Fix "0-Aug-25" to "1-Aug-25"
+          if (day > 31) day = 31; // Cap at 31
+          
+          let year = parts[2];
+          
+          // Handle 2-digit vs 4-digit year
+          if (year.length === 2) {
+            year = `20${year}`;
+          }
+          
+          parsedDate = new Date(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+        } else {
+          // Format: "28-06-23" (DD-MM-YY) - numeric month
+          let day = parseInt(parts[0]) || 1;
+          if (day === 0) day = 1;
+          if (day > 31) day = 31;
+          
+          let month = parseInt(parts[1]) || 1;
+          if (month === 0) month = 1;
+          if (month > 12) month = 12;
+          
+          let year = parts[2];
+          
+          if (year.length === 2) {
+            year = `20${year}`;
+          }
+          
+          parsedDate = new Date(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+        }
       }
     }
-    
+    // Format 2: "2 August 2025" or "2 Augsut 2025" (with spaces)
+    else if (dateStr.includes(" ")) {
+      const parts = dateStr.split(/\s+/);
+      if (parts.length >= 3) {
+        const monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+        const monthNamesAlt = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+        
+        // Handle common misspellings
+        const monthMisspellings = {
+          "augsut": "august",
+          "agust": "august",
+          "septemper": "september",
+          "ocotber": "october",
+          "novemper": "november",
+          "decemper": "december"
+        };
+        
+        let monthLower = parts[1].toLowerCase().replace(/[^a-z]/g, '');
+        
+        // Check for misspellings first
+        if (monthMisspellings[monthLower]) {
+          monthLower = monthMisspellings[monthLower];
+        }
+        
+        let monthIndex = monthNames.indexOf(monthLower.substring(0, 3));
+        if (monthIndex === -1) {
+          monthIndex = monthNamesAlt.indexOf(monthLower);
+        }
+        
+        if (monthIndex !== -1) {
+          let day = parseInt(parts[0]) || 1;
+          if (day === 0) day = 1;
+          if (day > 31) day = 31;
+          
+          let year = parts[2];
+          parsedDate = new Date(`${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+        }
+      }
+    }
+    // Format 3: "/8/23" or "8/8/23" (M/D/YY or MM/DD/YY)
+    else if (dateStr.includes("/")) {
+      const parts = dateStr.split("/");
+      if (parts.length === 3) {
+        let month = parseInt(parts[0]) || 1;
+        if (month === 0) month = 1;
+        if (month > 12) month = 12;
+        
+        let day = parseInt(parts[1]) || 1;
+        if (day === 0) day = 1;
+        if (day > 31) day = 31;
+        
+        let year = parts[2];
+        
+        if (!year || year.trim() === "") {
+          year = new Date().getFullYear().toString();
+        } else if (year.length === 2) {
+          year = `20${year}`;
+        }
+        
+        parsedDate = new Date(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+      }
+    }
+    // Format 4: Try direct parsing as fallback
+    else {
+      parsedDate = new Date(dateStr);
+    }
+
+    // Validate and return
+    if (parsedDate && parsedDate instanceof Date && !isNaN(parsedDate)) {
+      return parsedDate.toISOString().split("T")[0];
+    }
+
+    // Only log unparseable dates
+    if (dateStr && dateStr.trim() !== "") {
+      console.warn("Could not parse date:", dateStr);
+    }
     return null;
   };
 
-  // Function to check certificate expiry status
-  const checkExpiryStatus = (expiryDate) => {
-    if (!expiryDate) return "Invalid Date";
+  // Function to check certificate expiry status from string
+  const checkExpiryStatusFromString = (expiryDateStr) => {
+    if (!expiryDateStr) return "Unknown";
     
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-    return expiry >= today ? "Valid" : "Expired";
+    // Extract year from various formats
+    const yearMatch = expiryDateStr.match(/\d{4}/) || expiryDateStr.match(/\d{2}$/);
+    if (!yearMatch) return "Valid"; // If no year found, assume valid
+    
+    let year = parseInt(yearMatch[0]);
+    if (year < 100) year += 2000; // Convert 2-digit year
+    
+    const currentYear = new Date().getFullYear();
+    return year >= currentYear ? "Valid" : "Expired";
   };
 
   // Function to upload data to Cockpit CMS
@@ -63,139 +285,288 @@ function BulkUpload() {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setUploadProgress(0);
+    setCurrentEntry(0);
+    setTotalEntries(parsedData.length);
 
     try {
-      const API_URL = "http://localhost/cert-verification/api/content/item/certificates"; // Replace with your Cockpit base URL
-      const API_TOKEN = "Bearer API-d9823105104e4a61de49056e3539b02c7a3519fa"; // Replace with your API token
+      const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/content/item/certificates`;
 
-      // Loop through the parsed data and upload each item
-      const promises = parsedData.map((entry) => {
+      let successCount = 0;
+      let failCount = 0;
+      const failedEntries = [];
+
+      // Process entries one by one to ensure all are attempted
+      for (let i = 0; i < parsedData.length; i++) {
+        const entry = parsedData[i];
+        
+        // Update progress
+        setCurrentEntry(i + 1);
+        setUploadProgress(Math.round(((i + 1) / parsedData.length) * 100));
+        
+        // Skip entries without certificate number
+        if (!entry["Certificate No."] || entry["Certificate No."].trim() === "") {
+          console.log(`Skipping entry ${i + 1}: No certificate number`);
+          continue;
+        }
+
         let formattedExpiryDate = entry["Certificate Expiry Date"];
-
-        if (formattedExpiryDate) {
-          // Format the expiry date
+        const rawDate = formattedExpiryDate;
+        
+        if (formattedExpiryDate && formattedExpiryDate.trim() !== "") {
           formattedExpiryDate = formatDate(formattedExpiryDate);
+          
+          // Log date conversion for first entry
+          if (i === 0) {
+            console.log(`Date conversion: "${rawDate}" -> "${formattedExpiryDate}"`);
+          }
         } else {
           formattedExpiryDate = null;
         }
 
-        const expiryStatus = checkExpiryStatus(formattedExpiryDate);
+        // Calculate status based on formatted date
+        let isValid = false;
+        if (formattedExpiryDate) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const expiryDate = new Date(formattedExpiryDate);
+          expiryDate.setHours(0, 0, 0, 0);
+          isValid = expiryDate >= today;
+        }
 
-        return fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: API_TOKEN,
-          },
-          body: JSON.stringify({
+        try {
+          const payload = {
             data: {
-              certienum: entry["Certificate No."],
-              name: entry["Student Name"],
-              coursename: entry["Course Name"],
-              issuedate: formattedExpiryDate, // Send formatted expiry date
-              status: expiryStatus, // Add status based on expiry date
+              certienum: entry["Certificate No."] || null,
+              name: entry["Student Name"] || null,
+              coursename: entry["Course Name"] || null,
+              expairydate: formattedExpiryDate,
+              status: isValid, // Use calculated boolean status
             },
-          }),
-        })
-          .then((res) => {
-            if (!res.ok) {
-              return res.text().then((text) => {
-                console.error(`Failed Entry ${entry["Certificate No."]}:`, text);
-                return Promise.reject(`Error: ${res.status} - ${res.statusText}`);
-              });
-            }
-            return res.json();
-          })
-          .then((json) => {
-            console.log(`Entry ${entry["Certificate No."]} successfully uploaded:`, json);
+          };
+          
+          // Log first entry for debugging
+          if (i === 0) {
+            console.log("First entry raw data:", entry);
+            console.log("First entry payload:", JSON.stringify(payload, null, 2));
+          }
+          
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
           });
-      });
 
-      await Promise.all(promises);
-      setSuccess("All entries uploaded successfully!");
+          if (response.ok) {
+            successCount++;
+            console.log(`✓ Entry ${i + 1}/${parsedData.length}: ${entry["Certificate No."]} uploaded`);
+          } else {
+            failCount++;
+            const errorText = await response.text();
+            console.error(`✗ Entry ${i + 1}: ${entry["Certificate No."]} failed`);
+            console.error(`Response status: ${response.status}`);
+            console.error(`Error details:`, errorText);
+            failedEntries.push(entry["Certificate No."]);
+          }
+        } catch (err) {
+          failCount++;
+          console.error(`✗ Entry ${i + 1}: ${entry["Certificate No."]} error - ${err.message}`);
+          failedEntries.push(entry["Certificate No."]);
+        }
+      }
+
+      if (failCount === 0) {
+        setSuccess(`All ${successCount} entries uploaded successfully!`);
+      } else {
+        setSuccess(`Uploaded ${successCount} entries. ${failCount} failed.`); 
+        setError(`Failed entries: ${failedEntries.join(", ")}`);
+      }
     } catch (err) {
       console.error("Upload failed:", err);
       setError(err.message || "An unexpected error occurred during upload.");
     } finally {
       setLoading(false);
+      setUploadProgress(100);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-blue-600">Bulk Upload</h1>
-        <p className="text-gray-600 mt-2">
-          Paste your CSV data below to upload it to the collection.
-        </p>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto">
+        <header className="text-center mb-8">
+          <h1 className="text-5xl font-bold text-blue-700 mb-2">Bulk Certificate Upload</h1>
+          <p className="text-gray-600 text-lg">
+            Upload CSV files to import multiple certificates at once
+          </p>
+        </header>
 
-      <textarea
-        value={csvData}
-        onChange={(e) => setCsvData(e.target.value)}
-        rows={10}
-        className="w-full max-w-2xl p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-        placeholder="Paste your CSV data here..."
-      ></textarea>
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block mb-3 text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                📁 Upload CSV File
+              </label>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleFileUpload}
+                disabled={loading}
+                className="block w-full text-sm text-gray-900 border-2 border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 focus:outline-none focus:border-blue-500 p-3 transition"
+              />
+              {fileName && (
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-700 font-medium">✓ {fileName}</p>
+                </div>
+              )}
+            </div>
 
-      <button
-        onClick={parseCSV}
-        className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
-      >
-        Parse CSV
-      </button>
+            <div>
+              <label className="block mb-3 text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                📋 Or Paste CSV Data
+              </label>
+              <textarea
+                value={csvData}
+                onChange={(e) => setCsvData(e.target.value)}
+                rows={5}
+                disabled={loading}
+                className="w-full p-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                placeholder="Student Name,Certificate No.,Course Name,Certificate Expiry Date&#10;John Doe,AT0123456,Fire Safety,1-Jan-25"
+              ></textarea>
+            </div>
+          </div>
 
-      {parsedData.length > 0 && (
-        <div className="w-full max-w-2xl mt-8">
-          <h2 className="text-lg font-bold mb-4">Parsed Data:</h2>
-          <table className="w-full table-auto border-collapse border border-gray-300">
-            <thead>
-              <tr>
-                {Object.keys(parsedData[0]).map((key) => (
-                  <th
-                    key={key}
-                    className="border border-gray-300 px-4 py-2 bg-gray-200 text-left"
+          <div className="flex justify-center">
+            <button
+              onClick={parseCSV}
+              className="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold"
+              disabled={!csvData.trim() || loading}
+            >
+              {loading ? "Processing..." : "Parse CSV"}
+            </button>
+          </div>
+        </div>
+
+        {parsedData.length > 0 && (
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                📊 Parsed Data: <span className="text-blue-600">{parsedData.length}</span> entries
+              </h2>
+              <button
+                onClick={uploadData}
+                className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700 transition shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center gap-2"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    🚀 Upload {parsedData.length} Entries
+                  </>
+                )}
+              </button>
+            </div>
+
+            {loading && (
+              <div className="mb-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-blue-700">
+                    Uploading: {currentEntry} / {totalEntries}
+                  </span>
+                  <span className="text-2xl font-bold text-blue-700">{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-300 flex items-center justify-center text-white text-xs font-bold"
+                    style={{ width: `${uploadProgress}%` }}
                   >
-                    {key}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {parsedData.map((row, index) => (
-                <tr key={index}>
-                  {Object.values(row).map((value, i) => (
-                    <td key={i} className="border border-gray-300 px-4 py-2 text-gray-700">
-                      {i === 3 && value ? (
-                        // Format the expiry date before rendering
-                        formatDate(value)
-                      ) : (
-                        value
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button
-            onClick={uploadData}
-            className="mt-4 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
-            disabled={loading}
-          >
-            {loading ? "Uploading..." : "Upload to CMS"}
-          </button>
-        </div>
-      )}
+                    {uploadProgress > 10 && `${uploadProgress}%`}
+                  </div>
+                </div>
+              </div>
+            )}
 
-      {error && (
-        <div className="mt-4 text-red-500 font-semibold">
-          Error: {error}
-        </div>
-      )}
-      {success && (
-        <div className="mt-4 text-green-500 font-semibold">{success}</div>
-      )}
+            <div className="overflow-x-auto max-h-96 overflow-y-auto border-2 border-gray-200 rounded-lg">
+              <table className="w-full table-auto border-collapse">
+                <thead className="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                  <tr>
+                    <th className="border border-gray-300 px-4 py-3 text-left font-semibold">#</th>
+                    {Object.keys(parsedData[0]).map((key) => (
+                      <th
+                        key={key}
+                        className="border border-gray-300 px-4 py-3 text-left font-semibold"
+                      >
+                        {key}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {parsedData.slice(0, 50).map((row, index) => (
+                    <tr key={index} className="hover:bg-blue-50 transition">
+                      <td className="border border-gray-300 px-4 py-2 text-gray-700 font-medium">
+                        {index + 1}
+                      </td>
+                      {Object.entries(row).map(([key, value], i) => {
+                        const isDateColumn = key === 'Certificate Expiry Date';
+                        
+                        return (
+                          <td key={i} className="border border-gray-300 px-4 py-2 text-gray-700">
+                            {isDateColumn && value ? (
+                              <div>
+                                <div className="font-semibold text-blue-600">{value}</div>
+                                <div className="text-xs text-gray-500">({checkExpiryStatusFromString(value)})</div>
+                              </div>
+                            ) : (
+                              value
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {parsedData.length > 50 && (
+              <p className="text-sm text-gray-600 mt-4 text-center bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                ℹ️ Showing first 50 of {parsedData.length} entries in preview
+              </p>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-md">
+            <div className="flex items-start">
+              <span className="text-2xl mr-3">❌</span>
+              <div>
+                <h3 className="text-red-800 font-bold mb-1">Error</h3>
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        {success && (
+          <div className="mt-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-md">
+            <div className="flex items-start">
+              <span className="text-2xl mr-3">✅</span>
+              <div>
+                <h3 className="text-green-800 font-bold mb-1">Success</h3>
+                <p className="text-green-700 text-sm">{success}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

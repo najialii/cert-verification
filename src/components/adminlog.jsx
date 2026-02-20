@@ -7,33 +7,18 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
-    try {
-    
-      const response = await fetch('http://localhost/cert-verification/cockpit/api/authentication/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Store the authentication token and redirect to the admin page
-        localStorage.setItem('cockpitToken', data.token);  // Store token in localStorage
-        navigate('/admin');  // Redirect to the admin layout page
-      } else {
-        setError('Invalid credentials, please try again.');
-      }
-    } catch (err) {
-      setError('An error occurred while logging in.');
+    // Frontend-only authentication
+    if (username === 'admin' && password === 'admin') {
+      // Store authentication status
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('adminUser', username);
+      // Redirect to the admin page
+      navigate('/admin');
+    } else {
+      setError('Invalid credentials, please try again.');
     }
   };
 

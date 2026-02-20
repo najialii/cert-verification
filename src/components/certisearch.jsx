@@ -6,8 +6,6 @@ function Certisearch() {
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editedCertificate, setEditedCertificate] = useState(null);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -19,7 +17,7 @@ function Certisearch() {
 
     try {
       const response = await fetch(
-        `http://localhost/cert-verification/api/content/items/certificates?populate=*&filter[certienum]=${certificateNumber}`
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/content/items/certificates?filter[certienum]=${certificateNumber}`
       );
 
       if (!response.ok) {
@@ -30,8 +28,22 @@ function Certisearch() {
       console.log("Certificate Data:", data);
 
       if (data && data.length > 0) {
-        setCertificate(data[0]);
-        setEditedCertificate(data[0]);
+        const cert = data[0];
+        
+        // Recalculate status based on current date
+        let isValid = false;
+        if (cert.expairydate) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const expiryDate = new Date(cert.expairydate);
+          expiryDate.setHours(0, 0, 0, 0);
+          isValid = expiryDate >= today;
+        }
+        
+        // Update certificate with recalculated status
+        cert.status = isValid;
+        
+        setCertificate(cert);
         toast.success("Certificate found!", { progress: false });
       } else {
         setCertificate(null);
@@ -47,200 +59,84 @@ function Certisearch() {
     }
   };
 
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditedCertificate((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = async () => {
-    if (!editedCertificate.certienum || !editedCertificate.name || !editedCertificate.coursename) {
-      toast.error("All fields must be filled!");
-      return;
-    }
-
-    try {
-      if (!certificate._id) {
-        throw new Error("Certificate ID is missing.");
-      }
-
-      toast.info("Updating certificate...");
-      const response = await fetch(
-        `http://localhost/cert-verification/api/collections/save/certificates`, 
-        {
-          method: "POST", 
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            _id: certificate._id, 
-            certienum: editedCertificate.certienum,
-            name: editedCertificate.name,
-            coursename: editedCertificate.coursename,
-            expairydate: editedCertificate.expairydate,
-            status: editedCertificate.status,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Response Status:", response.status);
-        console.error("Error Text:", errorText);
-        throw new Error(`Failed to update certificate. Status: ${response.status}`);
-      }
-
-      const updatedData = await response.json();
-      setCertificate(updatedData);
-      setEditMode(false);
-      toast.success("Certificate updated successfully!");
-    } catch (err) {
-      console.error("Error:", err);
-      toast.error("Failed to update certificate.");
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col pb-12">
-      <div className="z-10 px-4 mb-8">
-        <div className="flex justify-center items-center">
-          <h2 className="text-blue-600 text-4xl leading-tight font-bold mt-20">Student Search</h2>
+    <div style={{ backgroundColor: '#ADD8E6', minHeight: '100vh', padding: '40px 20px', fontFamily: 'Arial, sans-serif' }}>
+      <center>
+        <h1 style={{ marginBottom: '30px', fontSize: '32px' }}>Student Search</h1>
+        
+        <div style={{ 
+          backgroundColor: 'white', 
+          maxWidth: '800px', 
+          minHeight: '400px',
+          padding: '30px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <form onSubmit={handleSearch} style={{ marginBottom: '20px' }}>
+            <input
+              id="certificateNumber"
+              name="certificateNumber"
+              type="text"
+              placeholder="Enter Certificate Number"
+              style={{
+                padding: '8px 12px',
+                width: '300px',
+                border: '1px solid #ccc',
+                marginRight: '10px'
+              }}
+              required
+            />
+            <button 
+              type="submit"
+              style={{
+                padding: '8px 20px',
+                backgroundColor: '#f0f0f0',
+                border: '1px solid #ccc',
+                cursor: 'pointer'
+              }}
+            >
+              {loading ? "Searching..." : "Search"}
+            </button>
+          </form>
+
+          {error && (
+            <p style={{ color: 'red', marginTop: '20px' }}><b>{error}</b></p>
+          )}
+
+          {certificate && (
+            <div style={{ marginTop: '30px' }}>
+              <table border="1" cellPadding="10" cellSpacing="0" style={{ margin: '0 auto', width: '100%' }}>
+                <tbody>
+                  <tr>
+                    <td><b>Certificate No:</b></td>
+                    <td>{certificate.certienum}</td>
+                  </tr>
+                  <tr>
+                    <td><b>Student Name:</b></td>
+                    <td>{certificate.name}</td>
+                  </tr>
+                  <tr>
+                    <td><b>Course Name:</b></td>
+                    <td>{certificate.coursename}</td>
+                  </tr>
+                  <tr>
+                    <td><b>Expiry Date:</b></td>
+                    <td>{certificate.expairydate || 'Not specified'}</td>
+                  </tr>
+                  <tr>
+                    <td><b>Status:</b></td>
+                    <td>
+                      <font color={certificate.status ? "green" : "red"}>
+                        <b>{certificate.status ? "Valid" : "Invalid"}</b>
+                      </font>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-        <form
-          onSubmit={handleSearch}
-          className="mx-auto mt-10 relative bg-white min-w-sm max-w-2xl flex flex-col md:flex-row items-center justify-center border py-2 px-2 rounded-2xl gap-2 shadow-2xl focus-within:border-gray-300"
-        >
-          <input
-            id="certificateNumber"
-            name="certificateNumber"
-            type="text"
-            placeholder="Enter certificate number"
-            className="px-6 py-2 w-full rounded-md flex-1 outline-none bg-white"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all disabled:opacity-70"
-          >
-            {loading ? "Searching..." : "Search"}
-          </button>
-        </form>
-      </div>
-
-      {error && <div className="mt-6 text-red-600 text-lg font-medium">{error}</div>}
-
-      {certificate && (
-        <div className="mt-12 w-full max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Certificate Details</h2>
-          <div className="space-y-4 text-lg text-gray-700">
-            <div className="flex justify-between items-center border-b border-gray-300 pb-3">
-              <span className="font-semibold text-gray-900">Certificate No:</span>
-              {editMode ? (
-                <input
-                  type="text"
-                  name="certienum"
-                  value={editedCertificate.certienum}
-                  onChange={handleEditChange}
-                  className="border rounded-md p-1"
-                />
-              ) : (
-                <span>{certificate.certienum}</span>
-              )}
-            </div>
-            <div className="flex justify-between items-center border-b border-gray-300 pb-3">
-              <span className="font-semibold text-gray-900">Student Name:</span>
-              {editMode ? (
-                <input
-                  type="text"
-                  name="name"
-                  value={editedCertificate.name}
-                  onChange={handleEditChange}
-                  className="border rounded-md p-1"
-                />
-              ) : (
-                <span>{certificate.name}</span>
-              )}
-            </div>
-            <div className="flex justify-between items-center border-b border-gray-300 pb-3">
-              <span className="font-semibold text-gray-900">Course Name:</span>
-              {editMode ? (
-                <input
-                  type="text"
-                  name="coursename"
-                  value={editedCertificate.coursename}
-                  onChange={handleEditChange}
-                  className="border rounded-md p-1"
-                />
-              ) : (
-                <span>{certificate.coursename}</span>
-              )}
-            </div>
-            <div className="flex justify-between items-center border-b border-gray-300 pb-3">
-              <span className="font-semibold text-gray-900">Expiry Date:</span>
-              {editMode ? (
-                <input
-                  type="text"
-                  name="expairydate"
-                  value={editedCertificate.expairydate}
-                  onChange={handleEditChange}
-                  className="border rounded-md p-1"
-                />
-              ) : (
-                <span>{certificate.expairydate}</span>
-              )}
-            </div>
-            <div className="flex justify-between items-center pb-3">
-              <span className="font-semibold text-gray-900">Status:</span>
-              {editMode ? (
-                <select
-                  name="status"
-                  value={editedCertificate.status}
-                  onChange={handleEditChange}
-                  className="border rounded-md p-1"
-                >
-                  <option value="true">Valid</option>
-                  <option value="false">Invalid</option>
-                </select>
-              ) : (
-                <span
-                  className={`font-semibold ${certificate.status ? "text-green-500" : "text-red-500"}`}
-                >
-                  {certificate.status ? "Valid" : "Invalid"}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-6 flex gap-4">
-            {editMode ? (
-              <>
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 bg-green-500 text-white rounded-md"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditMode(false)}
-                  className="px-4 py-2 bg-gray-300 text-black rounded-md"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setEditMode(true)}
-                className="px-4 py-2 bg-orange-500 text-white rounded-md"
-              >
-                Edit
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      <footer className="mt-16 text-center text-gray-500 text-sm">
-        <p>&copy; 2024 HSE . All rights reserved.</p>
-      </footer>
+      </center>
 
       <ToastContainer />
     </div>

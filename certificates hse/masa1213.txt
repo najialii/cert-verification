@@ -1,0 +1,19 @@
+home page 
+shop promotion
+products 
+
+Recipies 
+add customer 
+add admin
+
+
+about us 
+.
+.
+.
+
+fix cart 
+fix log and signup 
+
+UseFetch
+add post logic 

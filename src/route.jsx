@@ -12,7 +12,12 @@ import ProtectedRoute from "./proutes";
 
 function RouteComponent() {
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true
+      }}
+    >
       <div className="min-h-screen font-sans">
         <Header />
         <Routes>

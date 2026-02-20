@@ -26,25 +26,52 @@ function Certiupload() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost/cert-verification/api/content/item/certificates", {
+      // Calculate status based on expiry date
+      let isValid = false;
+      if (formData.expairydate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        const expiryDate = new Date(formData.expairydate);
+        expiryDate.setHours(0, 0, 0, 0);
+        isValid = expiryDate >= today;
+      }
+
+      // Prepare data with null for empty fields
+      const submitData = {
+        certienum: formData.certienum || null,
+        name: formData.name || null,
+        coursename: formData.coursename || null,
+        expairydate: formData.expairydate || null,
+        status: isValid // Auto-calculate based on expiry date
+      };
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/content/item/certificates`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer API-d9823105104e4a61de49056e3539b02c7a3519fa",
         },
-        body: JSON.stringify({ data: formData }),
+        body: JSON.stringify({ data: submitData }),
       });
 
-      console.log('Response Status:', response.status);
-      console.log('Response Body:', await response.text());
-
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error Response:', errorText);
         throw new Error(`Failed to upload data. HTTP status: ${response.status}`);
       }
 
       const data = await response.json();
       toast.success("Certificate uploaded successfully!"); 
       console.log("Response Data:", data);
+      
+      // Reset form after successful upload
+      setFormData({
+        certienum: "",
+        name: "",
+        coursename: "",
+        issuedate: "",
+        expairydate: "",
+        status: false,
+      });
     } catch (err) {
       console.error("Error:", err);
       toast.error(err.message || "An unexpected error occurred.");  
@@ -121,17 +148,18 @@ function Certiupload() {
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
         />
 
-        <label htmlFor="status" className="flex items-center text-gray-700 font-semibold mb-4">
-          <input
-            id="status"
-            name="status"
-            type="checkbox"
-            checked={formData.status}
-            onChange={handleInputChange}
-            className="mr-2"
-          />
-          Status (Valid)
-        </label>
+        {formData.expairydate && (
+          <div className="mb-4 p-3 rounded-md bg-gray-50 border">
+            <p className="text-sm text-gray-600">
+              Status: {' '}
+              <span className={`font-semibold ${
+                new Date(formData.expairydate) >= new Date() ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {new Date(formData.expairydate) >= new Date() ? '✓ Valid' : '✗ Expired'}
+              </span>
+            </p>
+          </div>
+        )}
 
         <button
           type="submit"
