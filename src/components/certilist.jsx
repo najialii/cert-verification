@@ -231,8 +231,8 @@ function Certilist() {
       <td className="border px-6 py-3">{certificate.name}</td>
       <td className="border px-6 py-3">{certificate.coursename}</td>
       <td className="border px-6 py-3">{certificate.expairydate}</td>
-      <td className={`border px-6 py-3 font-semibold ${certificate.status ? "text-green-500" : "text-red-500"}`}>
-        {certificate.status ? "Valid" : "Invalid"}
+      <td className="border px-6 py-3 font-semibold text-green-500">
+        Valid
       </td>
     </tr>
   ))}

@@ -126,8 +126,8 @@ function Certisearch() {
                   <tr>
                     <td><b>Status:</b></td>
                     <td>
-                      <font color={certificate.status ? "green" : "red"}>
-                        <b>{certificate.status ? "Valid" : "Invalid"}</b>
+                      <font color="green">
+                        <b>Valid</b>
                       </font>
                     </td>
                   </tr>
