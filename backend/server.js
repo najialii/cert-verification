@@ -115,10 +115,10 @@ app.get('/api/content/items/certificates', (req, res) => {
       return res.status(500).json({ error: err.message });
     }
     
-    // Convert status to boolean
+    // Always return status as true (valid) for all certificates
     const certificates = rows.map(row => ({
       ...row,
-      status: row.status === 1
+      status: true
     }));
     
     res.json(certificates);
